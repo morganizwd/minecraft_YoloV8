@@ -3,29 +3,24 @@ import win32api, win32con, torch, math, time
 from tkinter import messagebox
 from ultralytics import YOLO
 
-# ── ПУТИ К ВЕСАМ ────────────────────────────────────────────────────────────────
 PRIMARY_MODEL_PATH   = r"C:/Users/morga/Desktop/minecraft_v2/runs/train_v22/weights/best.pt"
 SECONDARY_MODEL_PATH = r"C:/Users/morga/Desktop/minecraft_v2/runs/train_v2/weights/best.pt"
 
-# ── НАСТРОЙКИ ПО УМОЛЧАНИЮ (меняются слайдерами) ───────────────────────────────
-DEFAULT_FOV_RADIUS  = 120      # px
-DEFAULT_SENSITIVITY = 1.0      # множитель dx/dy
-DEFAULT_COOLDOWN_MS = 80       # мс между движениями
+DEFAULT_FOV_RADIUS  = 120      
+DEFAULT_SENSITIVITY = 1.0     
+DEFAULT_COOLDOWN_MS = 80      
 
 IMG_SIZE   = 640
 CONF_THRES = 0.25
 IOU_NMS    = 0.5
 DEVICE     = "cuda" if torch.cuda.is_available() else "cpu"
 
-# ── ГЛОБАЛЬНОЕ СОСТОЯНИЕ ────────────────────────────────────────────────────────
 enable_aim   = True
 last_move_ms = 0
 
-# ── МОДЕЛИ ──────────────────────────────────────────────────────────────────────
 model1 = YOLO(PRIMARY_MODEL_PATH)
 model2 = YOLO(SECONDARY_MODEL_PATH)
 
-# ── ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ─────────────────────────────────────────────────────
 def capture_window(title):
     try:
         w = gw.getWindowsWithTitle(title)[0]
@@ -55,14 +50,12 @@ def merge_boxes(b, c):
         idxs = [j for j in idxs if iou(b[i], b[j]) < IOU_NMS]
     return b[keep], c[keep]
 
-# ── ГОРЯЧАЯ КЛАВИША ────────────────────────────────────────────────────────────
 def toggle_aim():
     global enable_aim
     enable_aim = not enable_aim
     status_var.set(f"Авто‑прицел: {'ON' if enable_aim else 'OFF'}  |  FOV {fov_var.get()}  |  S {sens_var.get():.2f}  |  cd {cool_var.get():.0f} мс")
 keyboard.add_hotkey("ctrl+alt+a", toggle_aim)
 
-# ── ОСНОВНОЙ ЦИКЛ ДЕТЕКЦИИ ─────────────────────────────────────────────────────
 def detection_loop(title):
     global last_move_ms
     while app.is_running:
@@ -120,10 +113,8 @@ def detection_loop(title):
     app.is_running=False
     start_btn.config(text="Запустить")
 
-# ── GUI ────────────────────────────────────────────────────────────────────────
 app = tk.Tk(); app.title("Minecraft FOV‑Aim"); app.geometry("480x460"); app.is_running=False
 
-# список окон
 tk.Label(app,text="Окно для захвата:",font=("Arial",11)).pack(pady=4)
 window_lb = tk.Listbox(app,width=60,height=8); window_lb.pack()
 def refresh_windows():
@@ -132,7 +123,6 @@ def refresh_windows():
         if t.strip(): window_lb.insert(tk.END,t)
 tk.Button(app,text="Обновить список",command=refresh_windows).pack(pady=2)
 
-# ── СЛАЙДЕРЫ ───────────────────────────────────────────────────────────────────
 def make_slider(text,var,from_,to,step):
     frm = tk.Frame(app); frm.pack()
     tk.Label(frm,text=text,width=23,anchor='w').pack(side='left')
@@ -147,12 +137,10 @@ make_slider("Радиус FOV (px)",       fov_var,  40, 300,   5)
 make_slider("Чувствительность",      sens_var, 0.3, 3.0,  0.05)
 make_slider("Кулдаун (мс)",          cool_var, 10, 300,  10)
 
-# статус
 status_var = tk.StringVar()
 status_var.set(f"Авто‑прицел: ON  |  FOV {fov_var.get()}  |  S {sens_var.get():.2f}  |  cd {cool_var.get():.0f} мс")
 tk.Label(app,textvariable=status_var,fg="gray").pack(pady=4)
 
-# запуск/стоп
 def toggle_detection():
     if not app.is_running:
         sel = window_lb.curselection()
@@ -165,7 +153,6 @@ def toggle_detection():
         app.is_running=False; start_btn.config(text="Запустить")
 start_btn = tk.Button(app,text="Запустить",command=toggle_detection); start_btn.pack(pady=10)
 
-# обновлять строку статуса при изменении слайдеров
 def update_status(*_):
     status_var.set(f"Авто‑прицел: {'ON' if enable_aim else 'OFF'}  |  "
                    f"FOV {fov_var.get()}  |  S {sens_var.get():.2f}  |  cd {cool_var.get():.0f} мс")
