@@ -3,8 +3,8 @@ import win32api, win32con, torch, math, time
 from tkinter import messagebox
 from ultralytics import YOLO
 
-PRIMARY_MODEL_PATH   = r"C:/Users/morga/Desktop/minecraft_v2/runs/train_v22/weights/best.pt"
-SECONDARY_MODEL_PATH = r"C:/Users/morga/Desktop/minecraft_v2/runs/train_v2/weights/best.pt"
+PRIMARY_MODEL_PATH   = r"minecraft_v2/runs/train_v2/weights/best.pt"
+SECONDARY_MODEL_PATH = r"minecraft_v2/runs/train_v22/weights/best.pt"
 
 DEFAULT_FOV_RADIUS  = 120      
 DEFAULT_SENSITIVITY = 1.0     
